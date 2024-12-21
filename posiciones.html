@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción de Gamertags</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        table {
+            width: 30%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td input {
+            width: 100%;
+            border: none;
+            text-align: center;
+            padding: 5px;
+            margin: 0 auto;
+            display: block;
+        }
+        td input:disabled {
+            background-color: #f9f9f9;
+        }
+        .editable {
+            width: 90%;
+            padding: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        #mensaje {
+            margin-bottom: 20px;
+        }
+        #lista {
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+        #loginContainer {
+            display: none;
+        }
+        .login-field {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h1>Carrera 1</h1>
+            <table id="carrera1">
+                <thead>
+                    <tr>
+                        <th>Posición</th>
+                        <th>Piloto</th>
+                        <th>Puntos</th>
+                    </tr>
+                </thead>
+                <tbody id="carrera1Body"></tbody>
+            </table>
+        </div>
+        <div>
+            <h1>Carrera 2</h1>
+            <table id="carrera2">
+                <thead>
+                    <tr>
+                        <th>Posición</th>
+                        <th>Piloto</th>
+                        <th>Puntos</th>
+                    </tr>
+                </thead>
+                <tbody id="carrera2Body"></tbody>
+            </table>
+        </div>
+        <div>
+            <h1>Posiciones Generales</h1>
