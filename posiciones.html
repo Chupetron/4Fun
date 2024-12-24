@@ -9,11 +9,12 @@
 <body>
     <div id="mensaje" class="centered-message"></div>
 
+    <!-- Contenedor de login, solo se ve antes de iniciar sesión -->
     <div class="login-container centered-container">
-        <input type="password" id="admin-password" placeholder="Contraseña de administrador">
         <button id="login-btn">Login</button>
     </div>
 
+    <!-- Panel de administración, oculto por defecto -->
     <div class="header centered-container" style="display: none;">
         <div class="admin-panel">
             <button onclick="guardarDatos()">Guardar</button>
@@ -25,6 +26,7 @@
         </div>
     </div>
 
+    <!-- Contenedor principal con las tablas, visible desde el inicio -->
     <div class="container">
         <div class="tabla-row">
             <!-- Carreras 1, 2 y 3 -->
@@ -130,24 +132,52 @@
 
     <script>
         const storedPassword = localStorage.getItem('adminPassword');
-        const defaultPassword = 'Q29udHJhc2VhQGVzdA=='; // Contraseña predeterminada codificada en Base64.
+        const loginButton = document.getElementById('login-btn');
+        const loginContainer = document.querySelector('.login-container');
+        const adminPanel = document.querySelector('.header');
+        const newPasswordInput = document.getElementById('new-admin-password');
 
-        function decodePassword(encodedPassword) {
-            return atob(encodedPassword);
-        }
-
+        // Si ya hay una contraseña guardada, no permitir ingreso sin contraseña
         function login() {
-            const inputPassword = document.getElementById('admin-password').value;
-            const decodedPassword = decodePassword(storedPassword || defaultPassword);
-            if (inputPassword === decodedPassword) {
-                document.querySelector('.header').style.display = 'block';
-                document.querySelector('.login-container').style.display = 'none';
-                alert('Acceso concedido!');
+            if (!storedPassword) {
+                // Si es el primer login, accede al panel sin contraseña
+                loginContainer.style.display = 'none';
+                adminPanel.style.display = 'block';
+                document.getElementById('mensaje').innerText = 'Bienvenido. Configure su contraseña en el panel de control.';
             } else {
-                alert('Contraseña incorrecta');
+                // Si ya hay contraseña configurada, solicitar la contraseña
+                const passwordInput = prompt("Ingresa la contraseña de administrador:");
+                if (passwordInput === storedPassword) {
+                    loginContainer.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    document.getElementById('mensaje').innerText = 'Bienvenido al panel de administración.';
+                    habilitarCampos(); // Habilitar campos solo después de login exitoso
+                } else {
+                    alert("Contraseña incorrecta.");
+                }
             }
         }
 
+        // Cambiar la contraseña
+        function changeAdminPassword() {
+            const newPassword = newPasswordInput.value;
+            if (newPassword) {
+                localStorage.setItem('adminPassword', newPassword);
+                alert('Contraseña configurada correctamente.');
+            } else {
+                alert('Por favor ingrese una contraseña.');
+            }
+        }
+
+        // Habilitar los campos editables dentro del panel de control
+        function habilitarCampos() {
+            const campos = document.querySelectorAll('.piloto');
+            campos.forEach(input => {
+                input.disabled = false;
+            });
+        }
+
+        // Cargar los datos de las carreras desde localStorage
         function cargarDatos() {
             const puntosCarrera = [350, 320, 300, 280, 260, 240, 220, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 59, 40];
             for (let i = 1; i <= 5; i++) {
@@ -191,19 +221,24 @@
             const tablaPosiciones = document.getElementById('tablaPosiciones').querySelector('tbody');
             tablaPosiciones.innerHTML = '';
 
-            posicionesGenerales.forEach(([piloto, puntos], index) => {
+            posicionesGenerales.forEach(([piloto, puntos]) => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${piloto}</td>
-                    <td>${puntos}</td>
-                `;
+                row.innerHTML = `<td>${piloto}</td><td>${puntos}</td>`;
                 tablaPosiciones.appendChild(row);
             });
         }
 
         function guardarDatos() {
             for (let i = 1; i <= 5; i++) {
-                const pilotosCarrera = Array.from(document.querySelectorAll(`#carrera${i} .piloto`)).map(input => input.value);
+                const carreraTable = document.getElementById(`carrera${i}`);
+                const tbody = carreraTable.querySelector('tbody');
+                const pilotosCarrera = [];
+
+                tbody.querySelectorAll('tr').forEach(row => {
+                    const pilotoInput = row.querySelector('input');
+                    pilotosCarrera.push(pilotoInput ? pilotoInput.value : '');
+                });
+
                 localStorage.setItem(`pilotosCarrera${i}`, JSON.stringify(pilotosCarrera));
             }
             actualizarPosicionesGenerales();
@@ -213,23 +248,17 @@
         function vaciarCarreras() {
             for (let i = 1; i <= 5; i++) {
                 const carreraTable = document.getElementById(`carrera${i}`);
-                const inputs = carreraTable.querySelectorAll('.piloto');
-                inputs.forEach(input => {
-                    input.value = '';
-                });
-            }
-            for (let i = 1; i <= 5; i++) {
-                localStorage.removeItem(`pilotosCarrera${i}`);
+                const tbody = carreraTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                localStorage.setItem(`pilotosCarrera${i}`, JSON.stringify([]));
             }
             actualizarPosicionesGenerales();
-            document.getElementById('mensaje').innerText = 'Todas las casillas de las carreras han sido vaciadas.';
+            document.getElementById('mensaje').innerText = 'Carreras vacías.';
         }
 
+        // Eventos
         document.getElementById('login-btn').addEventListener('click', login);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarDatos();
-        });
+        document.addEventListener('DOMContentLoaded', cargarDatos);
     </script>
 </body>
 </html>

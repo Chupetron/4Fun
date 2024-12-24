@@ -28,7 +28,6 @@
   </div>
 
   <div class="login-container">
-    <input type="password" id="admin-password" placeholder="Contraseña de administrador">
     <button onclick="login()">Login</button>
   </div>
 
@@ -41,7 +40,7 @@
 
   <script src="scripts/embedded-smart-player.min.js"></script>
   <script>
-    const encodedPassword = localStorage.getItem('adminPassword') || 'VmFjaWFydDBkMA==';
+    const encodedPassword = localStorage.getItem('adminPassword');
 
     function decodePassword(encodedPassword) {
       return atob(encodedPassword);
@@ -51,7 +50,7 @@
       return btoa(password);
     }
 
-    const ADMIN_PASSWORD = decodePassword(encodedPassword);
+    let ADMIN_PASSWORD = encodedPassword ? decodePassword(encodedPassword) : '';
 
     function registerGamertag() {
       const gamertag = document.getElementById('gamertag').value.trim();
@@ -91,24 +90,27 @@
     }
 
     function login() {
-      const inputPassword = document.getElementById('admin-password').value;
-      if (inputPassword === ADMIN_PASSWORD) {
+      if (!ADMIN_PASSWORD) {
         document.getElementById('clear-button').style.display = 'block';
         document.querySelector('.login-container').style.display = 'none';
         document.querySelector('.change-password-container').style.display = 'block';
-        document.querySelectorAll('.delete-button').forEach(button => {
-          button.style.display = 'inline';
-        });
       } else {
-        alert('Contraseña incorrecta');
+        const inputPassword = prompt('Ingresa la contraseña de administrador:');
+        if (inputPassword === ADMIN_PASSWORD) {
+          document.getElementById('clear-button').style.display = 'block';
+          document.querySelector('.login-container').style.display = 'none';
+          document.querySelector('.change-password-container').style.display = 'block';
+        } else {
+          alert('Contraseña incorrecta');
+        }
       }
     }
 
     function changeAdminPassword() {
       const newPassword = document.getElementById('new-admin-password').value;
       if (newPassword) {
-        const encodedNewPassword = encodePassword(newPassword);
-        localStorage.setItem('adminPassword', encodedNewPassword);
+        ADMIN_PASSWORD = encodePassword(newPassword);
+        localStorage.setItem('adminPassword', ADMIN_PASSWORD);
         alert('Contraseña de administrador cambiada exitosamente.');
         document.getElementById('new-admin-password').value = '';
       } else {
